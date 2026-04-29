@@ -25,3 +25,4 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         mensajeDiv.innerHTML = `<div class="alert alert-danger">Error de conexión con el banco.</div>`;
     }
 });
+
