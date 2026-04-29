@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Banco App</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Opcional: un poco de CSS personalizado para ajustar márgenes y fondo -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center min-vh-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-white text-center py-3">
+                        <h3 class="mb-0">Abrir cuenta</h3>
+                        <p class="text-muted">Completa tus datos para registrarte</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="registroForm">
+                            <!-- Fila 1: Nombre y Apellidos (dos columnas) -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" placeholder="Escribe tu nombre" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="apellidos" class="form-label">Apellidos</label>
+                                    <input type="text" class="form-control" id="apellidos" placeholder="Escribe tus apellidos" required>
+                                </div>
+                            </div>
+                            <!-- Correo electrónico -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+                            </div>
+                            <!-- Teléfono -->
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" placeholder="Número de contacto" required>
+                            </div>
+                            <!-- Dirección -->
+                            <div class="mb-3">
+                                <label for="direccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" placeholder="Calle, número, colonia, ciudad" required>
+                            </div>
+                            <!-- Contraseña -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" placeholder="Crea una contraseña segura" required>
+                                <div class="form-text">Mínimo 8 caracteres, incluye letras y números.</div>
+                            </div>
+                            <!-- Confirmar contraseña (opcional pero recomendado) -->
+                            <div class="mb-4">
+                                <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Repite tu contraseña" required>
+                            </div>
+                            <!-- Botón de registro -->
+                            <button type="submit" class="btn btn-primary w-100 py-2">Registrarse</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></small>
+                        </div>
+                    </div>
+                </div>
+                <!-- Espacio para mensajes (lo usará JS después) -->
+                <div id="mensaje" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS bundle (opcional para ciertos componentes, pero lo pongo por si acaso) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Aquí irá después tu archivo register.js -->
+    <!-- <script src="register.js"></script> -->
+</body>
+</html>
