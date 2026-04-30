@@ -15,7 +15,7 @@ app.post('/api/login', async (req, res) => {
         }
 
         // 3. HU-21: Verificación de Hash (Innegociable)
-        // Comparamos la clave ingresada con el hash guardado por tu compañero
+        // Comparamos la clave ingresada con el hash
         const esValida = await bcrypt.compare(password, usuario.password);
         
         if (esValida) {
