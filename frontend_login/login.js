@@ -21,7 +21,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             mensajeDiv.innerHTML = `<div class="alert alert-success">${datos.mensaje}</div>`;
             // HU-02: Redirección tras éxito
             setTimeout(() => {
-                window.location.href = 'dashboard.html'; 
+                window.location.href = '../dashboard.html'; 
             }, 2000);
         } else {
             mensajeDiv.innerHTML = `<div class="alert alert-danger">${datos.error}</div>`;
