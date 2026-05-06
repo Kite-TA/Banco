@@ -56,9 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (respuesta.ok) {
                 mostrarMensaje(datos.mensaje, 'success');
                 formulario.reset();   // Limpiar el formulario
-                // esta es una idea de opción nueva para redirigir a login después de 2 segundos
+                // CAMBIO AQUÍ: Entramos a la carpeta frontend_login
                 setTimeout(() => {
-                    window.location.href = 'login.html';
+                    window.location.href = 'frontend_login/login.html';
                 }, 2000);
             } else {
                 mostrarMensaje(datos.error || 'Error en el registro', 'danger');
