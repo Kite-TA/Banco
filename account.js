@@ -68,9 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (res.ok) {
-                mostrarMensaje(data.mensaje, 'success');
-                form.reset();
-                actualizarDescripcion();
+                // Ocultar formulario y mostrar resumen
+                document.getElementById('formularioSeccion').classList.add('d-none');
+                document.getElementById('resumenSeccion').classList.remove('d-none');
+                document.getElementById('tituloHeader').textContent = 'Resumen de Cuenta';
+
+                // Llenar datos del resumen
+                document.getElementById('numeroCuenta').textContent = data.numero_cuenta;
+                document.getElementById('tipoCuenta').textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+                document.getElementById('saldoInicial').textContent = `$${parseFloat(saldo).toFixed(2)}`;
             } else {
                 mostrarMensaje(data.error, 'danger');
             }
