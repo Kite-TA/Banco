@@ -47,6 +47,22 @@ if (strlen($password) < 6) {
     echo json_encode(['error' => 'La contraseña debe tener al menos 6 caracteres']);
     exit;
 }
+if (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/u', $nombre)) {
+    echo json_encode(['error' => 'El nombre solo puede contener letras y espacios']);
+    exit;
+}
+if (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/u', $apellidos)) {
+    echo json_encode(['error' => 'Los apellidos solo pueden contener letras y espacios']);
+    exit;
+}
+if (!preg_match('/^[0-9]+$/', $telefono)) {
+    echo json_encode(['error' => 'El teléfono solo puede contener números']);
+    exit;
+}
+if (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ,.\-#\/]+$/u', $direccion)) {
+    echo json_encode(['error' => 'La dirección no puede contener caracteres especiales']);
+    exit;
+}
 
 // 4. VERIFICAR SI EL EMAIL YA EXISTE (evitar duplicados)
 $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
