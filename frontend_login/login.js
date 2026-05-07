@@ -3,13 +3,12 @@
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email      = document.getElementById('email').value;
+    const password   = document.getElementById('password').value;
     const mensajeDiv = document.getElementById('mensaje');
 
     try {
-        // Salimos de frontend_login y entramos a backend_login
-        const respuesta = await fetch('../backend_login/login.php', { 
+        const respuesta = await fetch('../backend_login/login.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -18,11 +17,18 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
+            // Guardar sesión en localStorage para que el dashboard la use
+            localStorage.setItem('usuarioId',    datos.usuarioId);
+            localStorage.setItem('nombre',        datos.nombre);
+            localStorage.setItem('numeroCuenta',  datos.numeroCuenta);
+            localStorage.setItem('saldo',         datos.saldo);
+            localStorage.setItem('cuentaId',      datos.cuentaId);
+
             mensajeDiv.innerHTML = `<div class="alert alert-success">${datos.mensaje}</div>`;
-            // HU-02: Redirección tras éxito
+
             setTimeout(() => {
-                window.location.href = '../dashboard.html'; 
-            }, 2000);
+                window.location.href = '../dashboard.html';
+            }, 1500);
         } else {
             mensajeDiv.innerHTML = `<div class="alert alert-danger">${datos.error}</div>`;
         }
