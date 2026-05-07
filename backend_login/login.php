@@ -2,12 +2,12 @@
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
 
-// 1. CONEXIÓN A LA BASE DE DATOS 
-$host = 'localhost';
-$dbname = 'banco_db';
+$host       = 'localhost';
+$dbname     = 'banco_db';
 $usuario_bd = 'root';
-$password_bd = ''; // XAMPP por defecto no tiene contraseña
+$password_bd = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $usuario_bd, $password_bd);
@@ -17,9 +17,8 @@ try {
     exit;
 }
 
-// 2. RECIBIR DATOS DEL FRONTEND
-$data = json_decode(file_get_contents('php://input'), true);
-$email = trim($data['email'] ?? '');
+$data     = json_decode(file_get_contents('php://input'), true);
+$email    = trim($data['email']    ?? '');
 $password = $data['password'] ?? '';
 
 if (empty($email) || empty($password)) {
@@ -27,20 +26,27 @@ if (empty($email) || empty($password)) {
     exit;
 }
 
-// 3. BUSCAR AL USUARIO POR EMAIL
-$stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+// Buscar usuario + su cuenta en una sola consulta
+$stmt = $pdo->prepare("
+    SELECT u.id, u.nombre, u.password_hash, c.numero_cuenta, c.saldo, c.id as cuenta_id
+    FROM usuarios u
+    LEFT JOIN cuentas c ON c.usuario_id = u.id
+    WHERE u.email = ?
+    LIMIT 1
+");
 $stmt->execute([$email]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// 4. VERIFICAR CONTRASEÑA (HU-21: Validación de Seguridad)
-// Usamos password_verify porque tu compañero usó password_hash en el registro
 if ($usuario && password_verify($password, $usuario['password_hash'])) {
     echo json_encode([
-        'mensaje' => '¡Bienvenido, ' . $usuario['nombre'] . '!',
-        'usuarioId' => $usuario['id']
+        'mensaje'      => '¡Bienvenido, ' . $usuario['nombre'] . '!',
+        'usuarioId'    => $usuario['id'],
+        'nombre'       => $usuario['nombre'],
+        'numeroCuenta' => $usuario['numero_cuenta'],
+        'saldo'        => $usuario['saldo'],
+        'cuentaId'     => $usuario['cuenta_id']
     ]);
 } else {
-    // Si no existe o la contraseña no coincide
     http_response_code(401);
     echo json_encode(['error' => 'Correo o contraseña incorrectos']);
 }

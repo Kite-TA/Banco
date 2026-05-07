@@ -1,7 +1,4 @@
 <?php
-//Esta linea nomas la hice para verificar si esta funcionando el formulario con la base de datos, para recibir los datos y verlos en un archivo de texto, luego la borro
-file_put_contents('debug_log.txt', print_r($_POST, true) . "\n" . file_get_contents('php://input') . "\n", FILE_APPEND);
-
 // Configurar la respuesta como JSON y permitir peticiones desde cualquier origen
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
@@ -9,10 +6,10 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
 // 1. CONEXIÓN A LA BASE DE DATOS (MySQL)
-$host = 'localhost';
-$dbname = 'banco_db';
+$host       = 'localhost';
+$dbname     = 'banco_db';
 $usuario_bd = 'root';
-$password_bd = ''; //en este caso use XAMPP, por eso no tengo contraseña
+$password_bd = ''; // XAMPP por defecto no tiene contraseña
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $usuario_bd, $password_bd);
@@ -30,15 +27,14 @@ if (!$data) {
     exit;
 }
 
-// Extraer cada campo con valores por defecto vacíos
-$nombre = trim($data['nombre'] ?? '');
+$nombre    = trim($data['nombre']    ?? '');
 $apellidos = trim($data['apellidos'] ?? '');
-$email = trim($data['email'] ?? '');
-$telefono = trim($data['telefono'] ?? '');
+$email     = trim($data['email']     ?? '');
+$telefono  = trim($data['telefono']  ?? '');
 $direccion = trim($data['direccion'] ?? '');
-$password = $data['password'] ?? '';
+$password  = $data['password']       ?? '';
 
-// 3. VALIDACIONES DEL LADO DEL SERVIDOR (obligatorias por seguridad)
+// 3. VALIDACIONES DEL LADO DEL SERVIDOR
 if (empty($nombre) || empty($apellidos) || empty($email) || empty($telefono) || empty($direccion) || empty($password)) {
     echo json_encode(['error' => 'Todos los campos son obligatorios']);
     exit;
@@ -48,7 +44,7 @@ if (strlen($password) < 6) {
     exit;
 }
 
-// 4. VERIFICAR SI EL EMAIL YA EXISTE (evitar duplicados)
+// 4. VERIFICAR SI EL EMAIL YA EXISTE
 $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
 $stmt->execute([$email]);
 if ($stmt->fetch()) {
@@ -59,14 +55,38 @@ if ($stmt->fetch()) {
 // 5. ENCRIPTAR LA CONTRASEÑA
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-// 6. INSERTAR EL NUEVO USUARIO EN LA TABLA
-$sql = "INSERT INTO usuarios (nombre, apellidos, email, telefono, direccion, password_hash) 
-        VALUES (?, ?, ?, ?, ?, ?)";
-$stmt = $pdo->prepare($sql);
-$resultado = $stmt->execute([$nombre, $apellidos, $email, $telefono, $direccion, $passwordHash]);
+// 6. USAR TRANSACCIÓN para insertar usuario Y crear su cuenta bancaria
+try {
+    $pdo->beginTransaction();
 
-if ($resultado) {
-    echo json_encode(['mensaje' => 'Usuario registrado exitosamente', 'usuarioId' => $pdo->lastInsertId()]);
-} else {
-    echo json_encode(['error' => 'No se pudo registrar el usuario']);
+    // Insertar usuario
+    $sql  = "INSERT INTO usuarios (nombre, apellidos, email, telefono, direccion, password_hash)
+             VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$nombre, $apellidos, $email, $telefono, $direccion, $passwordHash]);
+    $nuevoUsuarioId = $pdo->lastInsertId();
+
+    // Generar número de cuenta único (10 dígitos)
+    do {
+        $numeroCuenta = str_pad(mt_rand(0, 9999999999), 10, '0', STR_PAD_LEFT);
+        $check = $pdo->prepare("SELECT id FROM cuentas WHERE numero_cuenta = ?");
+        $check->execute([$numeroCuenta]);
+    } while ($check->fetch());
+
+    // Crear cuenta bancaria de ahorro con saldo inicial de $0
+    $sqlCuenta = "INSERT INTO cuentas (usuario_id, tipo, numero_cuenta, saldo) VALUES (?, 'ahorro', ?, 0.00)";
+    $stmtCuenta = $pdo->prepare($sqlCuenta);
+    $stmtCuenta->execute([$nuevoUsuarioId, $numeroCuenta]);
+
+    $pdo->commit();
+
+    echo json_encode([
+        'mensaje'      => 'Usuario registrado exitosamente',
+        'usuarioId'    => $nuevoUsuarioId,
+        'numeroCuenta' => $numeroCuenta
+    ]);
+
+} catch (Exception $e) {
+    $pdo->rollBack();
+    echo json_encode(['error' => 'No se pudo completar el registro']);
 }
