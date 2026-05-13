@@ -1,2 +1,7 @@
 node_modules/
 .env
+// NO SUBIR LAS CONTRASEÑAS
+db.php
+/vendor/
+.env
+*.log
