@@ -18,28 +18,35 @@ try {
     exit;
 }
 
-$cuentaId = intval($_GET['cuentaId'] ?? 0);
+$cuentaId  = intval($_GET['cuentaId']  ?? 0);
+$usuarioId = intval($_GET['usuarioId'] ?? 0);  // REQUERIDO para verificar propiedad
 
-if ($cuentaId <= 0) {
+if ($cuentaId <= 0 || $usuarioId <= 0) {
     http_response_code(400);
-    echo json_encode(['error' => 'Parámetro inválido']);
+    echo json_encode(['error' => 'Parámetros inválidos']);
     exit;
 }
 
-// Saldo actual
-$stmt = $pdo->prepare("SELECT saldo, numero_cuenta FROM cuentas WHERE id = ?");
-$stmt->execute([$cuentaId]);
+// ── VERIFICACIÓN DE PROPIEDAD ─────────────────────────
+// La cuenta debe pertenecer al usuario que hace la petición
+$stmt = $pdo->prepare("
+    SELECT saldo, numero_cuenta
+    FROM cuentas
+    WHERE id = ? AND usuario_id = ?
+");
+$stmt->execute([$cuentaId, $usuarioId]);
 $cuenta = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$cuenta) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Cuenta no encontrada']);
+    // 403 en lugar de 404: sabemos que el recurso existe pero el usuario no tiene acceso
+    http_response_code(403);
+    echo json_encode(['error' => 'No tienes permiso para consultar esta cuenta']);
     exit;
 }
 
-// Últimos 50 movimientos
+// Últimos 50 movimientos — solo si la cuenta es del usuario
 $stmtTx = $pdo->prepare("
-    SELECT tipo, monto, descripcion, cuenta_relacionada, saldo_despues, fecha
+    SELECT id, tipo, monto, descripcion, cuenta_relacionada, saldo_despues, fecha
     FROM transacciones
     WHERE cuenta_id = ?
     ORDER BY fecha DESC
@@ -49,7 +56,7 @@ $stmtTx->execute([$cuentaId]);
 $transacciones = $stmtTx->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode([
-    'saldo'          => $cuenta['saldo'],
-    'numeroCuenta'   => $cuenta['numero_cuenta'],
-    'transacciones'  => $transacciones
+    'saldo'         => $cuenta['saldo'],
+    'numeroCuenta'  => $cuenta['numero_cuenta'],
+    'transacciones' => $transacciones
 ]);
