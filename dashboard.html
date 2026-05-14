@@ -255,6 +255,36 @@
             </div>
             <span class="badge bg-primary rounded-pill" id="total-movimientos">0</span>
         </div>
+
+        <!-- Filtros -->
+        <div class="card-body border-bottom p-3 bg-light">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">Desde</label>
+                    <input type="date" id="filtro-fecha-desde" class="form-control form-control-sm" onchange="aplicarFiltros()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">Hasta</label>
+                    <input type="date" id="filtro-fecha-hasta" class="form-control form-control-sm" onchange="aplicarFiltros()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">Tipo de operación</label>
+                    <select id="filtro-tipo" class="form-select form-select-sm" onchange="aplicarFiltros()">
+                        <option value="">Todas las operaciones</option>
+                        <option value="deposito">Depósito</option>
+                        <option value="retiro">Retiro</option>
+                        <option value="transferencia_enviada">Transferencia enviada</option>
+                        <option value="transferencia_recibida">Transferencia recibida</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-sm btn-outline-secondary w-100" onclick="limpiarFiltros()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Limpiar filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0" id="tabla-movimientos">
@@ -266,11 +296,12 @@
                             <th>Cuenta relacionada</th>
                             <th class="text-end pe-4">Monto</th>
                             <th class="text-end pe-4">Saldo tras op.</th>
+                            <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-movimientos">
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
+                            <td colspan="7" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                 Cargando movimientos…
                             </td>
@@ -283,6 +314,130 @@
 
 </div><!-- /container -->
 
+<!-- ═══════════════════════════════ MODAL CONFIRMACIÓN TRANSFERENCIA ════════ -->
+<div class="modal fade" id="modalConfirmarTransferencia" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Confirmar Transferencia</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Cuenta Origen</small>
+                                <div class="fw-bold" id="modal-cuenta-origen">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Cuenta Destino</small>
+                                <div class="fw-bold" id="modal-cuenta-destino">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Monto</small>
+                                <div class="fw-bold text-success" id="modal-monto-transf">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Referencia</small>
+                                <div class="fw-bold small" id="modal-referencia">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3 small mb-0" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>Verifica que todos los datos sean correctos antes de confirmar.
+                </div>
+            </div>
+            <div class="modal-footer gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-confirmar-transf" onclick="confirmarTransferenciaFinal()">
+                    <i class="bi bi-check me-1"></i>Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════ MODAL DETALLES TRANSACCIÓN ═════════════ -->
+<div class="modal fade" id="modalDetallesTransaccion" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="bi bi-receipt me-2"></i>Detalles de Transacción</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Tipo de Transacción</small>
+                                <div id="det-tipo">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Monto</small>
+                                <div class="fw-bold" id="det-monto">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Descripción</small>
+                                <div id="det-descripcion">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Cuenta Relacionada</small>
+                                <div id="det-cuenta-relacionada">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Fecha y Hora</small>
+                                <div id="det-fecha">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-1">Saldo después de la operación</small>
+                                <div class="fw-bold text-muted" id="det-saldo-despues">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ════════════════════════════════════════════════════════
@@ -293,7 +448,7 @@ const sesion = {
     nombre:       localStorage.getItem('nombre'),
     numeroCuenta: localStorage.getItem('numeroCuenta'),
     saldo:        localStorage.getItem('saldo'),
-    cuentaId:     localStorage.getItem('cuenta_id')
+    cuentaId:     localStorage.getItem('cuentaId')
 };
 
 
@@ -435,6 +590,9 @@ async function ejecutarRetiro() {
 }
 
 // ── Transferir ─────────────────────────────────────────
+// Variable para almacenar los datos de transferencia pendiente
+let transferenciaEnEspera = null;
+
 async function ejecutarTransferencia() {
     const cuentaDestino = document.getElementById('cuenta-destino').value.trim();
     const monto         = parseFloat(document.getElementById('monto-transferencia').value);
@@ -450,7 +608,24 @@ async function ejecutarTransferencia() {
         return;
     }
 
-    const btn = event.currentTarget;
+    // Almacenar los datos y mostrar modal de confirmación
+    transferenciaEnEspera = { cuentaDestino, monto };
+    
+    // Llenar el modal
+    document.getElementById('modal-cuenta-origen').textContent = sesion.numeroCuenta || '—';
+    document.getElementById('modal-cuenta-destino').textContent = cuentaDestino;
+    document.getElementById('modal-monto-transf').textContent = formatMoney(monto);
+    document.getElementById('modal-referencia').textContent = `Transferencia a ${cuentaDestino} - ${new Date().toLocaleString('es-MX')}`;
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalConfirmarTransferencia'));
+    modal.show();
+}
+
+async function confirmarTransferenciaFinal() {
+    if (!transferenciaEnEspera) return;
+
+    const btn = document.getElementById('btn-confirmar-transf');
     setBotonCargando(btn, true);
 
     try {
@@ -467,10 +642,14 @@ async function ejecutarTransferencia() {
         const datos = await resp.json();
 
         if (resp.ok) {
+            // Cerrar modal
+            bootstrap.Modal.getInstance(document.getElementById('modalConfirmarTransferencia')).hide();
+            
             actualizarSaldoUI(datos.nuevoSaldo);
-            mostrarAlerta(`✅ Transferencia de ${formatMoney(monto)} enviada a la cuenta ${cuentaDestino}.`, 'success');
+            mostrarAlerta(`✅ Transferencia de ${formatMoney(transferenciaEnEspera.monto)} enviada a la cuenta ${transferenciaEnEspera.cuentaDestino}.`, 'success');
             document.getElementById('cuenta-destino').value      = '';
             document.getElementById('monto-transferencia').value = '';
+            transferenciaEnEspera = null;
             cargarMovimientos();
         } else {
             mostrarAlerta(datos.error, 'danger');
@@ -485,6 +664,8 @@ async function ejecutarTransferencia() {
 // ════════════════════════════════════════════════════════
 //  HISTORIAL DE MOVIMIENTOS
 // ════════════════════════════════════════════════════════
+let transaccionesOriginales = [];
+
 const ETIQUETAS = {
     deposito:                 { label: 'Depósito',            clase: 'badge-deposito' },
     retiro:                   { label: 'Retiro',              clase: 'badge-retiro' },
@@ -502,9 +683,79 @@ function formatFecha(fechaStr) {
          + ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 }
 
+function renderizarMovimientos(txs) {
+    const tbody = document.getElementById('tbody-movimientos');
+    
+    if (txs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-3 d-block mb-2"></i>No hay movimientos que coincidan con los filtros.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = txs.map(tx => {
+        const etiq  = ETIQUETAS[tx.tipo] || { label: tx.tipo, clase: '' };
+        const salida = esSalida(tx.tipo);
+        const signMonto = salida
+            ? `<span class="monto-negativo">- ${formatMoney(tx.monto)}</span>`
+            : `<span class="monto-positivo">+ ${formatMoney(tx.monto)}</span>`;
+
+        return `
+        <tr>
+            <td class="px-4 text-nowrap text-muted small">${formatFecha(tx.fecha)}</td>
+            <td><span class="badge-tipo ${etiq.clase}">${etiq.label}</span></td>
+            <td class="small">${tx.descripcion || '—'}</td>
+            <td class="small text-muted">${tx.cuenta_relacionada ? `<i class="bi bi-arrow-left-right me-1"></i>${tx.cuenta_relacionada}` : '—'}</td>
+            <td class="text-end pe-4">${signMonto}</td>
+            <td class="text-end pe-4 small text-muted">${formatMoney(tx.saldo_despues)}</td>
+            <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary" title="Ver detalles" onclick="mostrarDetallesTransaccion(${JSON.stringify(tx).replace(/"/g, '&quot;')})">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function aplicarFiltros() {
+    const fechaDesde = document.getElementById('filtro-fecha-desde').value;
+    const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
+    const tipoFiltro = document.getElementById('filtro-tipo').value;
+
+    let txsFiltradas = transaccionesOriginales;
+
+    // Filtrar por tipo
+    if (tipoFiltro) {
+        txsFiltradas = txsFiltradas.filter(tx => tx.tipo === tipoFiltro);
+    }
+
+    // Filtrar por rango de fechas
+    if (fechaDesde || fechaHasta) {
+        txsFiltradas = txsFiltradas.filter(tx => {
+            const fechaTx = new Date(tx.fecha).toISOString().split('T')[0];
+            
+            if (fechaDesde && fechaTx < fechaDesde) return false;
+            if (fechaHasta && fechaTx > fechaHasta) return false;
+            
+            return true;
+        });
+    }
+
+    document.getElementById('total-movimientos').textContent = txsFiltradas.length;
+    renderizarMovimientos(txsFiltradas);
+}
+
+function limpiarFiltros() {
+    document.getElementById('filtro-fecha-desde').value = '';
+    document.getElementById('filtro-fecha-hasta').value = '';
+    document.getElementById('filtro-tipo').value = '';
+    
+    document.getElementById('total-movimientos').textContent = transaccionesOriginales.length;
+    renderizarMovimientos(transaccionesOriginales);
+}
+
 async function cargarMovimientos() {
     const tbody = document.getElementById('tbody-movimientos');
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">
         <span class="spinner-border spinner-border-sm me-2"></span>Actualizando…</td></tr>`;
 
     try {
@@ -517,34 +768,19 @@ async function cargarMovimientos() {
         actualizarSaldoUI(datos.saldo, datos.numeroCuenta);
 
         const txs = datos.transacciones;
+        transaccionesOriginales = txs;
         document.getElementById('total-movimientos').textContent = txs.length;
 
         if (txs.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>Aún no tienes movimientos.</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = txs.map(tx => {
-            const etiq  = ETIQUETAS[tx.tipo] || { label: tx.tipo, clase: '' };
-            const salida = esSalida(tx.tipo);
-            const signMonto = salida
-                ? `<span class="monto-negativo">- ${formatMoney(tx.monto)}</span>`
-                : `<span class="monto-positivo">+ ${formatMoney(tx.monto)}</span>`;
-
-            return `
-            <tr>
-                <td class="px-4 text-nowrap text-muted small">${formatFecha(tx.fecha)}</td>
-                <td><span class="badge-tipo ${etiq.clase}">${etiq.label}</span></td>
-                <td class="small">${tx.descripcion || '—'}</td>
-                <td class="small text-muted">${tx.cuenta_relacionada ? `<i class="bi bi-arrow-left-right me-1"></i>${tx.cuenta_relacionada}` : '—'}</td>
-                <td class="text-end pe-4">${signMonto}</td>
-                <td class="text-end pe-4 small text-muted">${formatMoney(tx.saldo_despues)}</td>
-            </tr>`;
-        }).join('');
+        renderizarMovimientos(txs);
 
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger">
             <i class="bi bi-exclamation-triangle me-1"></i>${err.message || 'Error al cargar movimientos.'}</td></tr>`;
     }
 }
