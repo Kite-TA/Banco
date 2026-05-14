@@ -21,7 +21,7 @@
             border: 1px solid rgba(255,255,255,.4);
             color: #fff; font-size: .85rem;
             border-radius: 20px; padding: 4px 14px;
-            text-decoration: none;
+            text-decoration: none; cursor: pointer;
         }
         .btn-nav:hover { background: rgba(255,255,255,.3); color: #fff; }
 
@@ -30,34 +30,58 @@
             border: none;
             border-radius: 14px;
             box-shadow: 0 2px 10px rgba(0,0,0,.08);
-            transition: transform .15s, box-shadow .15s, outline .1s;
+            transition: transform .15s, box-shadow .15s;
             overflow: hidden;
-            cursor: pointer;
         }
-        .cuenta-card:hover { transform: translateY(-4px); box-shadow: 0 8px 22px rgba(0,0,0,.14); }
-
-        /* Resaltado de cuenta activa */
+        .cuenta-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.13); }
         .cuenta-card.es-activa { outline: 3px solid #ffd600; outline-offset: 2px; }
+
+        .cuenta-header-ahorro    { background: linear-gradient(135deg, #2e7d32, #43a047); }
+        .cuenta-header-corriente { background: linear-gradient(135deg, var(--azul-banco), #1976d2); }
+        .cuenta-header { color: #fff; padding: 20px 22px 16px; }
+        .cuenta-header .tipo-label { font-size: .78rem; opacity: .8; letter-spacing: 1px; text-transform: uppercase; }
+        .cuenta-header .num-cuenta { font-size: .9rem; opacity: .8; letter-spacing: 2px; margin-bottom: 4px; }
+        .cuenta-header .saldo-val  { font-size: 2rem; font-weight: 700; }
+
         .badge-activa {
             background: #ffd600; color: #333;
             font-size: .7rem; font-weight: 700;
             border-radius: 20px; padding: 2px 10px;
-            vertical-align: middle; margin-left: 6px;
+            vertical-align: middle;
         }
 
-        .cuenta-header-ahorro    { background: linear-gradient(135deg, #2e7d32, #43a047); }
-        .cuenta-header-corriente { background: linear-gradient(135deg, #0d47a1, #1976d2); }
-        .cuenta-header { color: #fff; padding: 20px 22px 14px; }
-        .cuenta-header .tipo-label { font-size: .78rem; opacity: .8; letter-spacing: 1px; text-transform: uppercase; }
-        .cuenta-header .num-cuenta { font-size: .9rem; opacity: .8; letter-spacing: 2px; margin-bottom: 4px; }
-        .cuenta-header .saldo-val  { font-size: 2rem; font-weight: 700; }
-        .cuenta-header .hint       { font-size: .75rem; opacity: .65; margin-top: 4px; }
+        /* Cuerpo con botones */
+        .cuenta-body { padding: 14px 16px; }
+        .cuenta-body .fecha { font-size: .78rem; color: #888; }
+        .badge-ahorro    { background: #e8f5e9; color: #2e7d32; border-radius: 20px; padding: 3px 10px; font-size: .76rem; }
+        .badge-corriente { background: #e3f2fd; color: #0d47a1; border-radius: 20px; padding: 3px 10px; font-size: .76rem; }
 
-        .cuenta-body { padding: 14px 22px; }
-        .cuenta-body .fecha { font-size: .8rem; color: #888; }
-
-        .badge-ahorro    { background: #e8f5e9; color: #2e7d32; border-radius: 20px; padding: 3px 12px; font-size: .78rem; }
-        .badge-corriente { background: #e3f2fd; color: #0d47a1; border-radius: 20px; padding: 3px 12px; font-size: .78rem; }
+        /* Botones de acción en la tarjeta */
+        .btn-card-operar  {
+            flex: 1;
+            background: rgba(0,0,0,.06);
+            border: none;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .btn-card-operar:hover  { background: rgba(0,0,0,.13); }
+        .btn-card-detalle {
+            flex: 1;
+            border: 1.5px solid #dee2e6;
+            background: #fff;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--azul-banco);
+            transition: background .15s, border-color .15s;
+        }
+        .btn-card-detalle:hover { background: #e3f2fd; border-color: var(--azul-banco); }
 
         .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
         .empty-state i { font-size: 3rem; display: block; margin-bottom: 12px; }
@@ -82,7 +106,7 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
         <div>
             <h5 class="fw-bold mb-0"><i class="bi bi-wallet2 me-2 text-primary"></i>Mis Cuentas</h5>
-            <small class="text-muted">Haz clic en una tarjeta para operar con esa cuenta en el Dashboard</small>
+            <small class="text-muted">Selecciona una cuenta para operar o ver su detalle</small>
         </div>
         <a href="account.html" class="btn btn-primary btn-sm">
             <i class="bi bi-plus me-1"></i>Nueva cuenta
@@ -101,7 +125,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ── Sesión ──────────────────────────────────────────────
 const sesion = {
     usuarioId: localStorage.getItem('usuarioId'),
     nombre:    localStorage.getItem('nombre'),
@@ -112,23 +135,26 @@ document.getElementById('nav-usuario').textContent = `Hola, ${sesion.nombre}`;
 
 function cerrarSesion() { localStorage.clear(); window.location.href = 'frontend_login/login.html'; }
 
-// ── Helpers ─────────────────────────────────────────────
-function formatMoney(v) {
+function fmt(v) {
     return '$' + parseFloat(v).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-function formatFecha(f) {
+function fmtFecha(f) {
     return new Date(f).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// ── Seleccionar cuenta y volver al dashboard ────────────
-function seleccionarCuenta(cuentaId, numeroCuenta, saldo) {
-    localStorage.setItem('cuentaId',     cuentaId);
-    localStorage.setItem('numeroCuenta', numeroCuenta);
+// Activar cuenta y redirigir al dashboard
+function operarCon(id, numero, saldo) {
+    localStorage.setItem('cuentaId',     id);
+    localStorage.setItem('numeroCuenta', numero);
     localStorage.setItem('saldo',        saldo);
     window.location.href = 'dashboard.html';
 }
 
-// ── Cargar cuentas ───────────────────────────────────────
+// Ir a la página de detalle
+function verDetalle(id) {
+    window.location.href = `cuenta_detalle.html?cuentaId=${id}`;
+}
+
 async function cargarCuentas() {
     const grid = document.getElementById('cuentasGrid');
 
@@ -144,7 +170,7 @@ async function cargarCuentas() {
                     <div class="empty-state">
                         <i class="bi bi-wallet2"></i>
                         <p class="fw-semibold mb-1">Aún no tienes cuentas</p>
-                        <p class="small text-muted mb-3">Crea tu primera cuenta bancaria para comenzar.</p>
+                        <p class="small text-muted mb-3">Crea tu primera cuenta bancaria.</p>
                         <a href="account.html" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-1"></i>Crear mi primera cuenta
                         </a>
@@ -155,31 +181,41 @@ async function cargarCuentas() {
 
         grid.innerHTML = data.cuentas.map(c => {
             const esActiva = c.id == sesion.cuentaId;
+            const tipoLabel = c.tipo === 'ahorro' ? '💰 Cuenta de Ahorro' : '💳 Cuenta Corriente';
             return `
             <div class="col-md-6 col-lg-4">
-                <div class="cuenta-card ${esActiva ? 'es-activa' : ''}"
-                     onclick="seleccionarCuenta(${c.id}, '${c.numero_cuenta}', ${c.saldo})"
-                     title="Clic para operar con esta cuenta">
+                <div class="cuenta-card ${esActiva ? 'es-activa' : ''}">
 
+                    <!-- Cabecera de color -->
                     <div class="cuenta-header cuenta-header-${c.tipo}">
                         <div class="tipo-label">
-                            ${c.tipo === 'ahorro' ? '💰 Cuenta de Ahorro' : '💳 Cuenta Corriente'}
-                            ${esActiva ? '<span class="badge-activa ms-1">ACTIVA EN DASHBOARD</span>' : ''}
+                            ${tipoLabel}
+                            ${esActiva ? '<span class="badge-activa ms-2">EN USO</span>' : ''}
                         </div>
                         <div class="num-cuenta">Nº ${c.numero_cuenta}</div>
-                        <div class="saldo-val">${formatMoney(c.saldo)}</div>
-                        <div class="hint"><i class="bi bi-arrow-right-circle me-1"></i>Haz clic para operar con esta cuenta</div>
+                        <div class="saldo-val">${fmt(c.saldo)}</div>
                     </div>
 
-                    <div class="cuenta-body d-flex align-items-center justify-content-between">
-                        <div>
+                    <!-- Cuerpo -->
+                    <div class="cuenta-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="badge-${c.tipo}">${c.tipo.charAt(0).toUpperCase()+c.tipo.slice(1)}</span>
-                            <div class="fecha mt-2"><i class="bi bi-calendar3 me-1"></i>Apertura: ${formatFecha(c.fecha_apertura)}</div>
+                            <div class="fecha"><i class="bi bi-calendar3 me-1"></i>${fmtFecha(c.fecha_apertura)}</div>
                         </div>
-                        <div class="text-success fw-semibold small">
-                            <i class="bi bi-check-circle me-1"></i>Activa
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex gap-2">
+                            <button class="btn-card-operar"
+                                    onclick="operarCon(${c.id}, '${c.numero_cuenta}', ${c.saldo})">
+                                <i class="bi bi-arrow-left-right me-1"></i>Operar
+                            </button>
+                            <button class="btn-card-detalle"
+                                    onclick="verDetalle(${c.id})">
+                                <i class="bi bi-eye me-1"></i>Ver detalle
+                            </button>
                         </div>
                     </div>
+
                 </div>
             </div>`;
         }).join('');
