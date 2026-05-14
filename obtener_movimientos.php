@@ -39,7 +39,7 @@ if (!$cuenta) {
 
 // Últimos 50 movimientos
 $stmtTx = $pdo->prepare("
-    SELECT tipo, monto, descripcion, cuenta_relacionada, saldo_despues, fecha
+    SELECT id, tipo, monto, descripcion, cuenta_relacionada, saldo_despues, fecha
     FROM transacciones
     WHERE cuenta_id = ?
     ORDER BY fecha DESC
