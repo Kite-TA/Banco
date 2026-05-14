@@ -146,7 +146,11 @@
         <a href="account.html" class="btn btn-cerrar" style="text-decoration:none">
             <i class="bi bi-plus-circle me-1"></i>Nueva cuenta
         </a>
-        <button class="btn btn-cerrar" onclick="cerrarSesion()">
+        <a href="#" onclick="exportarExcel()" class="btn btn-cerrar me-2" style="background: var(--verde); text-decoration: none;">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar Excel
+        </a>
+
+         <button class="btn btn-cerrar" onclick="cerrarSesion()">
             <i class="bi bi-box-arrow-right me-1"></i>Salir
         </button>
     </div>
@@ -179,66 +183,66 @@
     <!-- Operaciones -->
     <div class="row g-3 mb-4">
 
-        <!-- DEPOSITAR -->
-        <div class="col-md-4">
-            <div class="card card-op p-4 h-100">
-                <div class="icono-op icono-deposito"><i class="bi bi-plus-circle-fill"></i></div>
-                <h6 class="fw-bold mb-1">Depositar</h6>
-                <p class="text-muted small mb-3">Ingresa dinero a tu cuenta.</p>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Monto a depositar</label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input type="number" id="monto-deposito" class="form-control" placeholder="0.00" min="0.01" max="50000" step="0.01">
-                    </div>
-                </div>
-                <button class="btn btn-deposito text-white w-100 py-2" onclick="ejecutarDeposito()">
-                    <i class="bi bi-plus-circle me-1"></i>Depositar
-                </button>
-            </div>
-        </div>
+    <div class="row g-4 my-3">
 
-        <!-- RETIRAR -->
-        <div class="col-md-4">
-            <div class="card card-op p-4 h-100">
-                <div class="icono-op icono-retiro"><i class="bi bi-dash-circle-fill"></i></div>
-                <h6 class="fw-bold mb-1">Retirar</h6>
-                <p class="text-muted small mb-3">Extrae dinero de tu cuenta.</p>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Monto a retirar</label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input type="number" id="monto-retiro" class="form-control" placeholder="0.00" min="0.01" max="50000" step="0.01">
-                    </div>
+    <div class="col-md-4">
+        <div class="card card-op p-4 h-100">
+            <div class="icono-op icono-deposito"><i class="bi bi-plus-circle-fill"></i></div>
+            <h6 class="fw-bold mb-1">Depositar</h6>
+            <p class="text-muted small mb-3">Ingresa dinero a tu cuenta.</p>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Monto a depositar</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" id="monto-deposito" class="form-control" placeholder="0.00" min="0.01" max="50000" step="0.01">
                 </div>
-                <button class="btn btn-retiro text-white w-100 py-2" onclick="ejecutarRetiro()">
-                    <i class="bi bi-dash-circle me-1"></i>Retirar
-                </button>
             </div>
-        </div>
+            <button type="button" class="btn btn-deposito text-white w-100 py-2" onclick="ejecutarDeposito(event)">
+                <i class="bi bi-plus-circle me-1"></i>Depositar
+            </button>
+        </div> </div>
 
-        <!-- TRANSFERIR -->
-        <div class="col-md-4">
-            <div class="card card-op p-4 h-100">
-                <div class="icono-op icono-transf"><i class="bi bi-arrow-left-right"></i></div>
-                <h6 class="fw-bold mb-1">Transferir</h6>
-                <p class="text-muted small mb-3">Envía dinero a otra cuenta.</p>
-                <div class="mb-2">
-                    <label class="form-label small fw-semibold">Número de cuenta destino</label>
-                    <input type="text" id="cuenta-destino" class="form-control" placeholder="Ej. 1234567890" maxlength="20">
+    <div class="col-md-4">
+        <div class="card card-op p-4 h-100">
+            <div class="icono-op icono-retiro"><i class="bi bi-dash-circle-fill"></i></div>
+            <h6 class="fw-bold mb-1">Retirar</h6>
+            <p class="text-muted small mb-3">Extrae dinero de tu cuenta.</p>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Monto a retirar</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" id="monto-retiro" class="form-control" placeholder="0.00" min="0.01" max="50000" step="0.01">
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Monto a transferir</label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input type="number" id="monto-transferencia" class="form-control" placeholder="0.00" min="0.01" max="50000" step="0.01">
-                    </div>
-                </div>
-                <button class="btn btn-transf text-white w-100 py-2" onclick="ejecutarTransferencia()">
-                    <i class="bi bi-send me-1"></i>Transferir
-                </button>
             </div>
+            <button type="button" class="btn btn-retiro text-white w-100 py-2" onclick="ejecutarRetiro(event)">
+                <i class="bi bi-dash-circle me-1"></i>Retirar
+            </button>
         </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-op p-4 h-100">
+            <div class="icono-op icono-transf"><i class="bi bi-arrow-left-right"></i></div>
+            <h6 class="fw-bold mb-1">Transferir</h6>
+            <p class="text-muted small mb-3">Envía dinero a otra cuenta.</p>
+            <div class="mb-2">
+                <label class="form-label small fw-semibold">Número de cuenta destino</label>
+                <input type="text" id="cuenta-destino" class="form-control" placeholder="Ej. 1234567890" maxlength="20">
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Monto a transferir</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" id="monto-transferencia" class="form-control" placeholder="0.00" min="0.01" max="50000" step="0.01">
+                </div>
+            </div>
+            <button type="button" class="btn btn-transf text-white w-100 py-2" onclick="ejecutarTransferencia(event)">
+                <i class="bi bi-send me-1"></i>Transferir
+            </button>
+        </div>
+    </div>
+
+</div> ```
 
     </div><!-- /row operaciones -->
 
@@ -439,16 +443,16 @@
 // ════════════════════════════════════════════════════════
 //  SESIÓN (CORREGIDO)
 // ════════════════════════════════════════════════════════
+// Usamos "get" para que los datos siempre estén actualizados si cambian en el localStorage
 const sesion = {
-    usuarioId:    localStorage.getItem('usuarioId'),
-    nombre:       localStorage.getItem('nombre'),
-    numeroCuenta: localStorage.getItem('numeroCuenta'),
-    saldo:        localStorage.getItem('saldo'),
-    cuentaId:     localStorage.getItem('cuentaId')
+    get usuarioId()    { return localStorage.getItem('usuarioId'); },
+    get nombre()       { return localStorage.getItem('nombre'); },
+    get numeroCuenta() { return localStorage.getItem('numeroCuenta'); },
+    get saldo()        { return parseFloat(localStorage.getItem('saldo') || 0); },
+    get cuentaId()     { return localStorage.getItem('cuentaId'); }
 };
 
-// El guardia ahora solo revisa que el usuario exista
-// Si el usuarioId es nulo o vacío, entonces sí lo sacamos
+
 if (!sesion.usuarioId || sesion.usuarioId === "null") {
     console.log("Sesión no válida, redirigiendo...");
     window.location.href = 'frontend_login/login.html';
@@ -461,8 +465,11 @@ actualizarSaldoUI(sesion.saldo || 0, sesion.numeroCuenta || 'Sin cuenta');
 // ════════════════════════════════════════════════════════
 //  UI HELPERS
 // ════════════════════════════════════════════════════════
-function formatMoney(valor) {
-    return '$' + parseFloat(valor).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function formatMoney(monto) {
+    return new Intl.NumberFormat('es-MX', { 
+        style: 'currency', 
+        currency: 'MXN' 
+    }).format(monto);
 }
 
 function actualizarSaldoUI(saldo, numeroCuenta) {
@@ -510,40 +517,65 @@ function validarMonto(monto) {
 // ════════════════════════════════════════════════════════
 
 // ── Depositar ──────────────────────────────────────────
-async function ejecutarDeposito() {
-    const monto = parseFloat(document.getElementById('monto-deposito').value);
+async function ejecutarDeposito(e) {
+    // 🛠️ Corrección 1: Evita que la página se recargue si el botón está dentro de un <form>
+    if (e) e.preventDefault();
+
+    const inputMonto = document.getElementById('monto-deposito');
+    const monto = parseFloat(inputMonto.value);
+    
     const error = validarMonto(monto);
     if (error) { mostrarAlerta(error, 'warning'); return; }
 
-    const btn = event.currentTarget;
-    setBotonCargando(btn, true);
+    // 🛠️ Corrección 2: Captura el botón usando el parámetro 'e' de forma segura
+    const btn = e ? e.currentTarget : null;
+    if (btn) setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('depositar.php', {
+        const resp = await fetch('backend_em/procesar_transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cuentaId: sesion.cuentaId, monto })
+            body: JSON.stringify({ 
+                cuentaId: sesion.cuentaId, 
+                monto: monto, 
+                tipo: 'deposito'
+            })
         });
+
         const datos = await resp.json();
 
         if (resp.ok) {
             actualizarSaldoUI(datos.nuevoSaldo);
             mostrarAlerta(`✅ Depósito de ${formatMoney(monto)} realizado con éxito.`, 'success');
-            document.getElementById('monto-deposito').value = '';
-            cargarMovimientos();
+            
+            // Limpiamos el input usando la variable guardada
+            inputMonto.value = ''; 
+            
+            // Verificación por seguridad antes de ejecutar la función
+            if (typeof cargarMovimientos === 'function') {
+                cargarMovimientos();
+            }
         } else {
-            mostrarAlerta(datos.error, 'danger');
+            // Si el backend manda un error controlado, lo mostramos, si no, un texto genérico
+            mostrarAlerta(datos.error || 'Error al procesar el depósito.', 'danger');
         }
-    } catch {
+    } catch (err) {
+        console.error("Error en la petición:", err);
         mostrarAlerta('Error de conexión. Intenta de nuevo.', 'danger');
     } finally {
-        setBotonCargando(btn, false);
+        // 🛠️ Corrección 3: Asegura que el botón recupere su estado normal pase lo que pase
+        if (btn) setBotonCargando(btn, false);
     }
 }
 
 // ── Retirar ────────────────────────────────────────────
-async function ejecutarRetiro() {
-    const monto = parseFloat(document.getElementById('monto-retiro').value);
+async function ejecutarRetiro(e) {
+    // 🛠️ Corrección 1: Evita que la página se reinicie si el botón está en un <form>
+    if (e) e.preventDefault();
+
+    const inputMonto = document.getElementById('monto-retiro');
+    const monto = parseFloat(inputMonto.value);
+    
     const error = validarMonto(monto);
     if (error) { mostrarAlerta(error, 'warning'); return; }
 
@@ -552,29 +584,42 @@ async function ejecutarRetiro() {
         return;
     }
 
-    const btn = event.currentTarget;
-    setBotonCargando(btn, true);
+    // 🛠️ Corrección 2: Captura el botón usando 'e' de forma segura en vez del global 'event'
+    const btn = e ? e.currentTarget : null;
+    if (btn) setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('retirar.php', {
+        const resp = await fetch('backend_em/procesar_transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cuentaId: sesion.cuentaId, monto })
+            body: JSON.stringify({ 
+                cuentaId: sesion.cuentaId, 
+                monto: monto, 
+                tipo: 'retiro' 
+            })
         });
         const datos = await resp.json();
 
         if (resp.ok) {
             actualizarSaldoUI(datos.nuevoSaldo);
+            
+            // 🛠️ Corrección 3:  Actualiza la variable en memoria
+            sesion.saldo = datos.nuevoSaldo; 
+            
             mostrarAlerta(`✅ Retiro de ${formatMoney(monto)} realizado con éxito.`, 'success');
-            document.getElementById('monto-retiro').value = '';
-            cargarMovimientos();
+            inputMonto.value = '';
+            
+            if (typeof cargarMovimientos === 'function') {
+                cargarMovimientos();
+            }
         } else {
-            mostrarAlerta(datos.error, 'danger');
+            mostrarAlerta(datos.error || 'Error al procesar el retiro.', 'danger');
         }
-    } catch {
+    } catch (err) {
+        console.error(err);
         mostrarAlerta('Error de conexión. Intenta de nuevo.', 'danger');
     } finally {
-        setBotonCargando(btn, false);
+        if (btn) setBotonCargando(btn, false);
     }
 }
 
@@ -618,13 +663,14 @@ async function confirmarTransferenciaFinal() {
     setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('transferir.php', {
+        const resp = await fetch('backend/procesar_transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 cuentaId: sesion.cuentaId, 
-                cuentaDestino: transferenciaEnEspera.cuentaDestino, 
-                monto: transferenciaEnEspera.monto 
+                cuentaDestino: cuentaDestino,
+                monto: monto, 
+                tipo: 'transferencia' 
             })
         });
         const datos = await resp.json();
@@ -667,37 +713,44 @@ function esSalida(tipo) {
 
 function formatFecha(fechaStr) {
     const d = new Date(fechaStr);
+    // Validación por si la fecha viene mal de la BD
+    if (isNaN(d.getTime())) return 'Fecha inválida';
+    
     return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
          + ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 }
 
+// 4. FUNCIÓN: RENDERIZAR TABLA
 function renderizarMovimientos(txs) {
     const tbody = document.getElementById('tbody-movimientos');
-    
-    if (txs.length === 0) {
+    if (!tbody) return;
+
+    if (!txs || txs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted">
-            <i class="bi bi-inbox fs-3 d-block mb-2"></i>No hay movimientos que coincidan con los filtros.</td></tr>`;
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>No hay movimientos que mostrar.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = txs.map(tx => {
-        const etiq  = ETIQUETAS[tx.tipo] || { label: tx.tipo, clase: '' };
-        const salida = esSalida(tx.tipo);
-        const signMonto = salida
-            ? `<span class="monto-negativo">- ${formatMoney(tx.monto)}</span>`
-            : `<span class="monto-positivo">+ ${formatMoney(tx.monto)}</span>`;
+        const tipoClave = (tx.tipo || 'desconocido').toLowerCase();
+        const etiq = ETIQUETAS[tipoClave] || { label: tx.tipo, clase: 'bg-secondary' };
+        
+        const esSalida = (tipoClave === 'retiro' || tipoClave === 'transferencia_enviada');
+        
+        const colorClase = esSalida ? 'text-danger' : 'text-success';
+        const signo = esSalida ? '-' : '+';
 
         return `
-        <tr>
+        <tr class="align-middle">
             <td class="px-4 text-nowrap text-muted small">${formatFecha(tx.fecha)}</td>
-            <td><span class="badge-tipo ${etiq.clase}">${etiq.label}</span></td>
+            <td><span class="badge rounded-pill ${etiq.clase}">${etiq.label}</span></td>
             <td class="small">${tx.descripcion || '—'}</td>
-            <td class="small text-muted">${tx.cuenta_relacionada ? `<i class="bi bi-arrow-left-right me-1"></i>${tx.cuenta_relacionada}` : '—'}</td>
-            <td class="text-end pe-4">${signMonto}</td>
-            <td class="text-end pe-4 small text-muted">${formatMoney(tx.saldo_despues)}</td>
+            <td class="small text-muted text-center">${tx.cuenta_relacionada || '—'}</td>
+            <td class="text-end pe-4 fw-bold ${colorClase}">${signo} ${formatMoney(tx.monto || 0)}</td>
+            <td class="text-end pe-4 small text-muted">${formatMoney(tx.saldo_despues || 0)}</td>
             <td class="text-center">
-                <button class="btn btn-sm btn-outline-primary" title="Ver detalles" onclick="mostrarDetallesTransaccion(${JSON.stringify(tx).replace(/"/g, '&quot;')})">
-                    <i class="bi bi-eye"></i>
+                <button class="btn btn-sm btn-light border" title="Ver comprobante">
+                    <i class="bi bi-file-earmark-pdf"></i>
                 </button>
             </td>
         </tr>`;
@@ -741,52 +794,77 @@ function limpiarFiltros() {
     renderizarMovimientos(transaccionesOriginales);
 }
 
+// . FUNCIÓN DE CARGA ACTUALIZADA
+
 async function cargarMovimientos() {
     const tbody = document.getElementById('tbody-movimientos');
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">
-        <span class="spinner-border spinner-border-sm me-2"></span>Actualizando…</td></tr>`;
+    if (!tbody) return;
+
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">
+        <div class="spinner-border spinner-border-sm text-primary me-2"></div> Sincronizando historial...</td></tr>`;
 
     try {
-        const resp = await fetch(`obtener_movimientos.php?cuentaId=${sesion.cuentaId}`);
-        const datos = await resp.json();
-
-        if (!resp.ok) { throw new Error(datos.error); }
-
-        // Actualizar saldo
-        actualizarSaldoUI(datos.saldo, datos.numeroCuenta);
-
-        const txs = datos.transacciones;
-        transaccionesOriginales = txs;
-        document.getElementById('total-movimientos').textContent = txs.length;
-
-        if (txs.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted">
-                <i class="bi bi-inbox fs-3 d-block mb-2"></i>Aún no tienes movimientos.</td></tr>`;
-            return;
+        const id = sesion.cuentaId;
+        // Si no hay ID de cuenta, lanzamos error controlado
+        if (!id || id === "null" || id.trim() === "") {
+            throw new Error("No se encontró una cuenta vinculada activa.");
         }
 
-        renderizarMovimientos(txs);
+        const resp = await fetch(`backend_em/obtener_movimientos.php?cuentaId=${id}`);
+        
+        if (!resp.ok) {
+            const errorData = await resp.json().catch(() => ({ error: 'Error desconocido en el servidor' }));
+            throw new Error(errorData.error || 'Error en el servidor');
+        }
+
+        const datos = await resp.json();
+
+        if (typeof actualizarSaldoUI === 'function') {
+            actualizarSaldoUI(datos.saldo, datos.numeroCuenta);
+        }
+
+        transaccionesOriginales = datos.transacciones || [];
+        
+        const contador = document.getElementById('total-movimientos');
+        if (contador) contador.textContent = transaccionesOriginales.length;
+
+        renderizarMovimientos(transaccionesOriginales);
 
     } catch (err) {
+        console.error("❌ Error en cargarMovimientos:", err);
         tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger">
-            <i class="bi bi-exclamation-triangle me-1"></i>${err.message || 'Error al cargar movimientos.'}</td></tr>`;
+            <i class="bi bi-exclamation-octagon me-2"></i> ${err.message}</td></tr>`;
     }
 }
+// 6. INICIO AUTOMÁTICO
+document.addEventListener('DOMContentLoaded', () => {
+    // Solo cargamos si el usuarioId existe, para evitar conflictos con la redirección inicial
+    if (sesion.usuarioId && sesion.usuarioId !== "null" && sesion.usuarioId.trim() !== "") {
+        cargarMovimientos();
+    }
+});
 
-function mostrarDetallesTransaccion(tx) {
-    const etiq = ETIQUETAS[tx.tipo] || { label: tx.tipo, clase: '' };
+function exportarExcel() {
+    const id = sesion.cuentaId;
     
-    document.getElementById('det-tipo').innerHTML = `<span class="badge-tipo ${etiq.clase}">${etiq.label}</span>`;
-    document.getElementById('det-monto').textContent = formatMoney(tx.monto);
-    document.getElementById('det-descripcion').textContent = tx.descripcion || '—';
-    document.getElementById('det-cuenta-relacionada').textContent = tx.cuenta_relacionada || '—';
-    document.getElementById('det-fecha').textContent = formatFecha(tx.fecha);
-    document.getElementById('det-saldo-despues').textContent = formatMoney(tx.saldo_despues);
+    console.log("Iniciando exportación para cuentaId:", id);
+
+    // Verificación de seguridad
+    if (!id || id === "null" || id === "undefined") {
+       
+        if (typeof mostrarAlerta === 'function') {
+            mostrarAlerta("No se encontró el ID de la cuenta activa. Por favor, reasigna tu sesión.", "danger");
+        } else {
+            console.error("Error: ID de cuenta no encontrado en localStorage.");
+        }
+        return;
+    }
+
+    const urlExport = `backend_em/obtener_movimientos.php?cuentaId=${id}&export=excel`;
     
-    const modal = new bootstrap.Modal(document.getElementById('modalDetallesTransaccion'));
-    modal.show();
+   
+    window.location.href = urlExport;
 }
-
 // ════════════════════════════════════════════════════════
 //  CERRAR SESIÓN
 // ════════════════════════════════════════════════════════
