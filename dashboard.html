@@ -146,7 +146,11 @@
         <a href="account.html" class="btn btn-cerrar" style="text-decoration:none">
             <i class="bi bi-plus-circle me-1"></i>Nueva cuenta
         </a>
-        <button class="btn btn-cerrar" onclick="cerrarSesion()">
+        <a href="#" onclick="exportarExcel()" class="btn btn-cerrar me-2" style="background: var(--verde); text-decoration: none;">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar Excel
+        </a>
+
+         <button class="btn btn-cerrar" onclick="cerrarSesion()">
             <i class="bi bi-box-arrow-right me-1"></i>Salir
         </button>
     </div>
@@ -292,8 +296,7 @@ const sesion = {
     cuentaId:     localStorage.getItem('cuenta_id')
 };
 
-// El guardia ahora solo revisa que el usuario exista
-// Si el usuarioId es nulo o vacío, entonces sí lo sacamos
+
 if (!sesion.usuarioId || sesion.usuarioId === "null") {
     console.log("Sesión no válida, redirigiendo...");
     window.location.href = 'frontend_login/login.html';
@@ -364,11 +367,15 @@ async function ejecutarDeposito() {
     setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('depositar.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cuentaId: sesion.cuentaId, monto })
-        });
+    const resp = await fetch('backend_em/procesar_transaccion.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        cuentaId: sesion.cuentaId, 
+        monto: monto, 
+        tipo: 'deposito'})
+    });
+
         const datos = await resp.json();
 
         if (resp.ok) {
@@ -401,10 +408,14 @@ async function ejecutarRetiro() {
     setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('retirar.php', {
+        const resp = await fetch('backend_em/procesar_transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cuentaId: sesion.cuentaId, monto })
+            body: JSON.stringify({ 
+                cuentaId: sesion.cuentaId, 
+                monto: monto, 
+                tipo: 'retiro' 
+            })
         });
         const datos = await resp.json();
 
@@ -443,10 +454,15 @@ async function ejecutarTransferencia() {
     setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('transferir.php', {
+        const resp = await fetch('backend/procesar_transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cuentaId: sesion.cuentaId, cuentaDestino, monto })
+            body: JSON.stringify({ 
+                cuentaId: sesion.cuentaId, 
+                cuentaDestino: cuentaDestino,
+                monto: monto, 
+                tipo: 'transferencia' 
+            })
         });
         const datos = await resp.json();
 
@@ -531,6 +547,22 @@ async function cargarMovimientos() {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">
             <i class="bi bi-exclamation-triangle me-1"></i>${err.message || 'Error al cargar movimientos.'}</td></tr>`;
     }
+}
+
+function exportarExcel() {
+    // Intentamos obtener el ID con el nombre exacto que aparece en tu imagen
+    const id = localStorage.getItem('cuenta_id');
+    
+    // Esto es para que tú lo veas en la consola (F12 -> Console)
+    console.log("ID recuperado para exportar:", id);
+
+    if (!id || id === "null" || id === "undefined") {
+        mostrarAlerta("No se encontró el ID de la cuenta. Intenta iniciar sesión de nuevo.", "danger");
+        return;
+    }
+
+    // Si llegamos aquí, el ID existe. Redirigimos al PHP.
+    window.location.href = `backend_em/exportar_movimientos.php?cuenta_id=${id}`;
 }
 
 // ════════════════════════════════════════════════════════
