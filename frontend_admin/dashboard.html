@@ -29,7 +29,7 @@
 
   <div id="tabla-contenedor" class="table-responsive">
     <table class="table table-striped">
-      <thead><tr><th>Id</th><th>Nombre</th><th>Email</th><th>Tel</th><th>Registro</th><th>Activo</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Id</th><th>Nombre</th><th>Email</th><th>Tel</th><th>Registro</th><th>Activo</th><th>Bloqueado</th><th>Acciones</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
@@ -60,8 +60,12 @@ async function cargar(){
   const tbody = document.getElementById('tbody'); tbody.innerHTML='';
   if (!data.success) return;
   data.users.forEach(u=>{
+    const now = new Date();
+    const locked = u.lock_expires_at && new Date(u.lock_expires_at) > now;
+    const lockLabel = locked ? '<span class="badge bg-danger">Sí</span>' : '<span class="badge bg-success">No</span>';
+    const actions = `<button class="btn btn-sm btn-info me-1" data-id="${u.id}" onclick="ver(${u.id})">Ver</button><button class="btn btn-sm btn-warning" onclick="toggle(${u.id}, ${u.activo===0?1:0})">${u.activo===0?'Activar':'Desactivar'}</button>${locked?'<button class="btn btn-sm btn-success ms-1" onclick="unlock('+u.id+')">Desbloquear</button>':''}`;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${u.id}</td><td>${u.nombre} ${u.apellidos||''}</td><td>${u.email}</td><td>${u.telefono||''}</td><td>${u.fecha_registro}</td><td>${u.activo===0?'<span class="badge bg-danger">No</span>':'<span class="badge bg-success">Sí</span>'}</td><td><button class="btn btn-sm btn-info me-1" data-id="${u.id}" onclick="ver(${u.id})">Ver</button><button class="btn btn-sm btn-warning" onclick="toggle(${u.id}, ${u.activo===0?1:0})">${u.activo===0?'Activar':'Desactivar'}</button></td>`;
+    tr.innerHTML = `<td>${u.id}</td><td>${u.nombre} ${u.apellidos||''}</td><td>${u.email}</td><td>${u.telefono||''}</td><td>${u.fecha_registro}</td><td>${u.activo===0?'<span class="badge bg-danger">No</span>':'<span class="badge bg-success">Sí</span>'}</td><td>${lockLabel}</td><td>${actions}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -71,7 +75,10 @@ async function ver(id){
   const d = await resp.json();
   if (!d.success) return alert('Usuario no encontrado');
   const u = d.user;
-  document.getElementById('modal-body').innerHTML = `<p><strong>Nombre:</strong> ${u.nombre} ${u.apellidos||''}</p><p><strong>Email:</strong> ${u.email}</p><p><strong>Tel:</strong> ${u.telefono||'—'}</p><p><strong>Dirección:</strong> ${u.direccion||'—'}</p><p><strong>Registrado:</strong> ${u.fecha_registro}</p><p><strong>Activo:</strong> ${u.activo? 'Sí' : 'No'}</p>`;
+  const now = new Date();
+  const locked = u.lock_expires_at && new Date(u.lock_expires_at) > now;
+  const lockedText = locked ? `Sí (hasta ${u.lock_expires_at})` : 'No';
+  document.getElementById('modal-body').innerHTML = `<p><strong>Nombre:</strong> ${u.nombre} ${u.apellidos||''}</p><p><strong>Email:</strong> ${u.email}</p><p><strong>Tel:</strong> ${u.telefono||'—'}</p><p><strong>Dirección:</strong> ${u.direccion||'—'}</p><p><strong>Registrado:</strong> ${u.fecha_registro}</p><p><strong>Activo:</strong> ${u.activo? 'Sí' : 'No'}</p><p><strong>Bloqueado:</strong> ${lockedText}</p><p><strong>Intentos fallidos:</strong> ${u.failed_attempts||0}</p>`;
   new bootstrap.Modal(document.getElementById('modalUser')).show();
 }
 
@@ -80,6 +87,13 @@ async function toggle(id, nuevo){
   const resp = await fetch('../backend_admin/update_user.php', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,activo:nuevo})});
   const d = await resp.json();
   if (d.success) { alert('Estado actualizado'); cargar(); } else { alert(d.error||'Error'); }
+}
+
+async function unlock(id){
+  if (!confirm('Confirmar desbloquear usuario')) return;
+  const resp = await fetch('../backend_admin/update_user.php', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,unlock:true})});
+  const d = await resp.json();
+  if (d.success) { alert('Usuario desbloqueado'); cargar(); } else { alert(d.error||'Error'); }
 }
 
 document.getElementById('btn-buscar').addEventListener('click', cargar);
