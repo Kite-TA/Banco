@@ -35,17 +35,21 @@ try {
     // 3. Consulta de movimientos
     $stmtMovs = $pdo->prepare("
         SELECT 
-            fecha, 
-            tipo, 
-            IF(tipo = 'Deposito', 'Abono en ventanilla', 'Retiro de efectivo') AS descripcion,
-            NULL AS cuenta_relacionada,
+            fecha,
+            tipo,
+            COALESCE(descripcion, CASE LOWER(tipo)
+                WHEN 'deposito' THEN 'Depósito en ventanilla'
+                WHEN 'retiro' THEN 'Retiro de efectivo'
+                ELSE ''
+            END) AS descripcion,
+            cuenta_relacionada,
             monto,
-            ? AS saldo_despues
-        FROM movimientos 
+            saldo_despues
+        FROM transacciones 
         WHERE cuenta_id = ? 
         ORDER BY fecha DESC
     ");
-    $stmtMovs->execute([$cuenta['saldo'], $cuentaId]);
+    $stmtMovs->execute([$cuentaId]);
     $transacciones = $stmtMovs->fetchAll(PDO::FETCH_ASSOC);
 
     /**

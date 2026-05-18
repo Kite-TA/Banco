@@ -663,14 +663,13 @@ async function confirmarTransferenciaFinal() {
     setBotonCargando(btn, true);
 
     try {
-        const resp = await fetch('backend/procesar_transaccion.php', {
+        const resp = await fetch('transferir.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 cuentaId: sesion.cuentaId, 
-                cuentaDestino: cuentaDestino,
-                monto: monto, 
-                tipo: 'transferencia' 
+                cuentaDestino: transferenciaEnEspera.cuentaDestino,
+                monto: transferenciaEnEspera.monto
             })
         });
         const datos = await resp.json();
@@ -684,11 +683,14 @@ async function confirmarTransferenciaFinal() {
             document.getElementById('cuenta-destino').value      = '';
             document.getElementById('monto-transferencia').value = '';
             transferenciaEnEspera = null;
-            cargarMovimientos();
+            if (typeof cargarMovimientos === 'function') {
+                cargarMovimientos();
+            }
         } else {
-            mostrarAlerta(datos.error, 'danger');
+            mostrarAlerta(datos.error || 'Error al procesar la transferencia.', 'danger');
         }
-    } catch {
+    } catch (err) {
+        console.error('Transferencia fallida:', err);
         mostrarAlerta('Error de conexión. Intenta de nuevo.', 'danger');
     } finally {
         setBotonCargando(btn, false);
