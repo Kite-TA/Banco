@@ -11,8 +11,8 @@ if (!$cuenta_id || $cuenta_id === "null" || $cuenta_id === "undefined") {
 
 
 try {
-    // 3. Consultar historial en la tabla 'movimientos'
-    $stmt = $pdo->prepare("SELECT fecha, tipo, monto FROM movimientos WHERE cuenta_id = ? ORDER BY fecha DESC");
+    // 3. Consultar historial en la tabla 'transacciones'
+    $stmt = $pdo->prepare("SELECT fecha, tipo, descripcion, monto, saldo_despues FROM transacciones WHERE cuenta_id = ? ORDER BY fecha DESC");
     $stmt->execute([$cuenta_id]);
     $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -27,7 +27,7 @@ try {
     fprintf($archivo, chr(0xEF).chr(0xBB).chr(0xBF));
 
     // Encabezados de las columnas
-    fputcsv($archivo, ['FECHA Y HORA', 'TIPO DE OPERACION', 'MONTO ($)']);
+    fputcsv($archivo, ['FECHA Y HORA', 'TIPO DE OPERACION', 'DESCRIPCION', 'MONTO ($)', 'SALDO']);
 
     // Meter los datos de la base de datos al archivo
     foreach ($datos as $fila) {

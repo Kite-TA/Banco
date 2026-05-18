@@ -21,40 +21,41 @@ if ($cuenta_id <= 0 || $monto <= 0 || empty($tipo)) {
 try {
     $pdo->beginTransaction(); // Modo seguro activo
 
-    if ($tipo === 'deposito') {
-        // 1. Sumar al saldo
-        $stmt = $pdo->prepare("UPDATE cuentas SET saldo = saldo + ? WHERE id = ?");
-        $stmt->execute([$monto, $cuenta_id]);
+    $stmtCheck = $pdo->prepare("SELECT saldo FROM cuentas WHERE id = ?");
+    $stmtCheck->execute([$cuenta_id]);
+    $saldoActual = $stmtCheck->fetchColumn();
 
-        // 2. Anotar movimiento
-        $stmtMov = $pdo->prepare("INSERT INTO movimientos (cuenta_id, tipo, monto, fecha) VALUES (?, 'Deposito', ?, NOW())");
-        $stmtMov->execute([$cuenta_id, $monto]);
+    if ($saldoActual === false) {
+        throw new Exception('Cuenta no encontrada.');
+    }
+
+    if ($tipo === 'deposito') {
+        $nuevoSaldo = $saldoActual + $monto;
+        $stmt = $pdo->prepare("UPDATE cuentas SET saldo = ? WHERE id = ?");
+        $stmt->execute([$nuevoSaldo, $cuenta_id]);
+
+        $stmtMov = $pdo->prepare("INSERT INTO transacciones (cuenta_id, tipo, monto, descripcion, saldo_despues, fecha) VALUES (?, 'deposito', ?, 'Depósito en ventanilla', ?, NOW())");
+        $stmtMov->execute([$cuenta_id, $monto, $nuevoSaldo]);
 
     } elseif ($tipo === 'retiro') {
-        // 1. Validar fondos antes de restar
-        $stmtCheck = $pdo->prepare("SELECT saldo FROM cuentas WHERE id = ?");
-        $stmtCheck->execute([$cuenta_id]);
-        $saldoActual = $stmtCheck->fetchColumn();
-
         if ($saldoActual < $monto) {
             throw new Exception("Saldo insuficiente para retirar.");
         }
 
-        // 2. Restar al saldo
-        $stmt = $pdo->prepare("UPDATE cuentas SET saldo = saldo - ? WHERE id = ?");
-        $stmt->execute([$monto, $cuenta_id]);
+        $nuevoSaldo = $saldoActual - $monto;
+        $stmt = $pdo->prepare("UPDATE cuentas SET saldo = ? WHERE id = ?");
+        $stmt->execute([$nuevoSaldo, $cuenta_id]);
 
-        // 3. Anotar movimiento
-        $stmtMov = $pdo->prepare("INSERT INTO movimientos (cuenta_id, tipo, monto, fecha) VALUES (?, 'Retiro', ?, NOW())");
-        $stmtMov->execute([$cuenta_id, $monto]);
+        $stmtMov = $pdo->prepare("INSERT INTO transacciones (cuenta_id, tipo, monto, descripcion, saldo_despues, fecha) VALUES (?, 'retiro', ?, 'Retiro de efectivo', ?, NOW())");
+        $stmtMov->execute([$cuenta_id, $monto, $nuevoSaldo]);
+
+    } else {
+        throw new Exception('Tipo de transacción inválido.');
     }
 
     $pdo->commit(); // Guardar cambios de forma permanente
 
-    // Consultar el saldo final para actualizar tu tarjeta del Dashboard
-    $stmtSaldo = $pdo->prepare("SELECT saldo FROM cuentas WHERE id = ?");
-    $stmtSaldo->execute([$cuenta_id]);
-    $nuevoSaldo = $stmtSaldo->fetchColumn();
+    $nuevoSaldo = $nuevoSaldo ?? $saldoActual;
 
     echo json_encode([
         'success' => true,

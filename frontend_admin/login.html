@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Login — Banco</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>body{background:#f5f7fb} .card{max-width:420px;margin:70px auto}</style>
+</head>
+<body>
+<div class="card p-4 shadow-sm">
+  <h5 class="mb-3">Administración — Iniciar sesión</h5>
+  <div id="alerta"></div>
+  <div class="mb-2"><input id="usuario" class="form-control" placeholder="Usuario"></div>
+  <div class="mb-3"><input id="password" type="password" class="form-control" placeholder="Contraseña"></div>
+  <div class="d-grid"><button id="btn" class="btn btn-primary">Entrar</button></div>
+</div>
+<script>
+document.getElementById('btn').addEventListener('click', async ()=>{
+  const user = document.getElementById('usuario').value.trim();
+  const password = document.getElementById('password').value;
+  const alerta = document.getElementById('alerta');
+  alerta.innerHTML='';
+  try {
+    const resp = await fetch('../backend_admin/login.php', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user,password})});
+    const data = await resp.json();
+    if (resp.ok) {
+      localStorage.setItem('adminLogged','1');
+      window.location.href = 'dashboard.html';
+    } else {
+      alerta.innerHTML = `<div class="alert alert-danger">${data.error||'Credenciales inválidas'}</div>`;
+    }
+  } catch(err) { alerta.innerHTML = `<div class="alert alert-danger">Error de conexión</div>`; }
+});
+</script>
+</body>
+</html>
