@@ -26,24 +26,8 @@ El proyecto ya debe estar en esta ubicación.
 
 2. **Crea la base de datos:**
    - Hacer clic en la pestaña "SQL"
-   - Copiar y ejecutar este código:
+   - Importar schema.sql en phpmyadmin
 
-```sql
-CREATE DATABASE banco_db;
-USE banco_db;
-
-CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  `apellidos` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL UNIQUE,
-  `telefono` varchar(20) NOT NULL,
-  `direccion` varchar(200) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-);
-```
 
 ### 3. Iniciar XAMPP
 
@@ -55,7 +39,7 @@ CREATE TABLE `usuarios` (
 
 Abrir el navegador e ir a:
 ```
-http://localhost/BANCO/register.html
+http://localhost/BANCO
 ```
 
 ### 5. Probar el formulario

@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `telefono`       VARCHAR(20)   NOT NULL,
   `direccion`      VARCHAR(255)  NOT NULL,
   `password_hash`  VARCHAR(255)  NOT NULL,
+  `failed_attempts` INT(3)       NOT NULL DEFAULT 0,
+  `lock_expires_at` DATETIME     NULL DEFAULT NULL,
   `fecha_registro` TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
