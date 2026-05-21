@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mis Reportes</title>
+
+    <link rel="stylesheet"
+          href="reportes_usuario.css">
+
+</head>
+
+<body>
+
+    <!-- BARRA SUPERIOR -->
+
+    <div class="barra-superior">
+
+        <h1>Mis Reportes</h1>
+
+        <button
+            class="btn-regresar"
+            onclick="window.location.href='../../dashboard.html'">
+
+            ⬅ Volver al Dashboard
+
+        </button>
+
+    </div>
+
+    <!-- CONTENIDO -->
+
+    <div class="contenido">
+
+        <!-- CARDS -->
+
+        <div class="contenedor-cards">
+
+            <div class="card">
+                <h2>Saldo Actual</h2>
+                <p id="saldoActual">$0</p>
+            </div>
+
+            <div class="card">
+                <h2>Total Depósitos</h2>
+                <p id="totalDepositos">$0</p>
+            </div>
+
+            <div class="card">
+                <h2>Total Retiros</h2>
+                <p id="totalRetiros">$0</p>
+            </div>
+
+            <div class="card">
+                <h2>Total Transferencias</h2>
+                <p id="totalTransferencias">$0</p>
+            </div>
+
+        </div>
+
+        <!-- TABLA -->
+
+        <div class="tabla-contenedor">
+
+            <div class="encabezado-tabla">
+
+                <h2>Historial de Movimientos</h2>
+
+                <span class="contador">
+                    Total:
+                    <span id="total-movimientos">0</span>
+                </span>
+
+            </div>
+
+            <!-- FILTROS -->
+
+            <div class="filtros">
+
+                <input
+                    type="date"
+                    id="filtro-fecha-desde">
+
+                <input
+                    type="date"
+                    id="filtro-fecha-hasta">
+
+                <select id="filtro-tipo">
+
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="deposito">
+                        Depósitos
+                    </option>
+
+                    <option value="retiro">
+                        Retiros
+                    </option>
+
+                    <option value="transferencia_enviada">
+                        Transferencias enviadas
+                    </option>
+
+                    <option value="transferencia_recibida">
+                        Transferencias recibidas
+                    </option>
+
+                </select>
+
+                <button onclick="aplicarFiltros()">
+                    Filtrar
+                </button>
+
+                <button onclick="limpiarFiltros()">
+                    Limpiar
+                </button>
+
+            </div>
+
+            <!-- TABLA -->
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Cuenta Relacionada</th>
+                        <th>Monto</th>
+                        <th>Saldo Después</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="tbody-movimientos">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="reportes_usuario.js"></script>
+
+</body>
+</html>
