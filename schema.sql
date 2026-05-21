@@ -38,3 +38,14 @@ CREATE TABLE IF NOT EXISTS `transacciones` (
   `fecha`              TIMESTAMP                                                                 NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ── 4. Tokens de recuperación de contraseña (HU-04) ──────
+CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
+  `id`         INT(11)      NOT NULL AUTO_INCREMENT,
+  `usuario_id` INT(11)      NOT NULL,
+  `token`      CHAR(64)     NOT NULL UNIQUE,
+  `expires_at` DATETIME     NOT NULL,
+  `usado`      TINYINT(1)   NOT NULL DEFAULT 0,
+  `creado_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

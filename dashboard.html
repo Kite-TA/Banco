@@ -140,6 +140,9 @@
         <div class="usuario-info" id="nav-usuario">Cargando...</div>
     </div>
     <div class="d-flex gap-2">
+        <a href="perfil.html" class="btn btn-cerrar" style="text-decoration:none">
+            <i class="bi bi-person-circle me-1"></i>Mi perfil
+        </a>
         <a href="cuentas.html" class="btn btn-cerrar" style="text-decoration:none">
             <i class="bi bi-wallet2 me-1"></i>Mis cuentas
         </a>
@@ -161,7 +164,7 @@
 
 <!-- ═══════════════════════════════ CONTENIDO ════════════════════════════ -->
 <div class="container py-4">
-   
+
     <!-- Tarjeta de saldo -->
     <div class="card card-saldo p-4 mb-4">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
@@ -178,22 +181,6 @@
                 </button>
             </div>
         </div>
-    </div>
-   
-    <!-- activar o desactivar cuenta -->
-    <div class="form-check form-switch mt-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="switchEstadoCuenta">
-      <label
-        class="form-check-label text-success fw-bold"
-        id="labelEstadoCuenta"
-        for="switchEstadoCuenta">
-        Cuenta Activa
-      </label>
-
     </div>
 
     <!-- Operaciones -->
@@ -454,7 +441,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ════════════════════════════════════════════════════════
 //  SESIÓN (CORREGIDO)
@@ -583,7 +570,6 @@ async function ejecutarDeposito(e) {
         if (btn) setBotonCargando(btn, false);
     }
 }
-
 
 // ── Retirar ────────────────────────────────────────────
 async function ejecutarRetiro(e) {
@@ -829,7 +815,7 @@ async function cargarMovimientos() {
             throw new Error("No se encontró una cuenta vinculada activa.");
         }
 
-        const resp = await fetch(`backend_em/obtener_movimientos.php?cuentaId=${id}`);
+        const resp = await fetch(`backend_em/obtener_movimientos.php?cuentaId=${id}&usuarioId=${sesion.usuarioId}`);
         
         if (!resp.ok) {
             const errorData = await resp.json().catch(() => ({ error: 'Error desconocido en el servidor' }));
@@ -879,7 +865,7 @@ function exportarExcel() {
         return;
     }
 
-    const urlExport = `backend_em/obtener_movimientos.php?cuentaId=${id}&export=excel`;
+    const urlExport = `backend_em/obtener_movimientos.php?cuentaId=${id}&usuarioId=${sesion.usuarioId}&export=excel`;
     
    
     window.location.href = urlExport;
@@ -897,8 +883,6 @@ function cerrarSesion() {
 // ════════════════════════════════════════════════════════
 function cargarDatos() { cargarMovimientos(); }
 cargarMovimientos(); // cargar al entrar
-
 </script>
-<script src="/Banco/hu26_estado_cuentas/frontend_hu26/estado_script.js"></script>
 </body>
 </html>
