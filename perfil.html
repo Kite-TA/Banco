@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mi Perfil — Banco Lupita</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root { --azul-banco: #0d47a1; --azul-claro: #1565c0; }
+        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
+
+        .navbar-banco {
+            background: linear-gradient(135deg, var(--azul-banco), var(--azul-claro));
+            padding: 14px 24px;
+        }
+        .navbar-banco .brand        { font-size: 1.3rem; font-weight: 700; color: #fff; }
+        .navbar-banco .usuario-info { color: rgba(255,255,255,.85); font-size: .9rem; }
+        .btn-nav {
+            background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.4);
+            color: #fff; font-size: .85rem; border-radius: 20px;
+            padding: 4px 14px; text-decoration: none; cursor: pointer;
+        }
+        .btn-nav:hover { background: rgba(255,255,255,.3); color: #fff; }
+
+        /* Hero */
+        .perfil-hero {
+            background: linear-gradient(135deg, var(--azul-banco), var(--azul-claro));
+            border-radius: 18px; color: #fff; padding: 32px; position: relative; overflow: hidden;
+        }
+        .perfil-hero::after {
+            content: ''; position: absolute; right: -50px; top: -50px;
+            width: 220px; height: 220px; background: rgba(255,255,255,.06); border-radius: 50%;
+        }
+        .avatar {
+            width: 78px; height: 78px; border-radius: 50%;
+            background: rgba(255,255,255,.2); display: flex; align-items: center;
+            justify-content: center; font-size: 2rem; margin-bottom: 14px;
+            border: 3px solid rgba(255,255,255,.4);
+        }
+        .perfil-hero .nombre-full { font-size: 1.6rem; font-weight: 700; }
+        .perfil-hero .desde       { font-size: .82rem; opacity: .7; margin-top: 4px; }
+
+        /* Cards */
+        .info-card, .edit-card {
+            background: #fff; border: none; border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.07); padding: 24px; height: 100%;
+        }
+        .card-titulo {
+            font-size: .75rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: #888;
+            margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* Filas de dato */
+        .dato-row {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 11px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .dato-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .dato-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .dato-label { font-size: .73rem; color: #999; margin-bottom: 2px; }
+        .dato-valor { font-size: .96rem; font-weight: 600; color: #222; word-break: break-all; }
+        .dato-valor.muted { color: #777; font-weight: 400; }
+
+        .ic-nombre { background:#e3f2fd; color:#0d47a1; }
+        .ic-email  { background:#fce4ec; color:#c62828; }
+        .ic-tel    { background:#e8f5e9; color:#2e7d32; }
+        .ic-dir    { background:#fff3e0; color:#e65100; }
+        .ic-fecha  { background:#f3e5f5; color:#6a1b9a; }
+
+        /* Chips resumen */
+        .chip {
+            background: #fff; border: none; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            padding: 16px; text-align: center;
+        }
+        .chip .val { font-size: 1.6rem; font-weight: 700; }
+        .chip .lbl { font-size: .78rem; color: #888; margin-top: 2px; }
+
+        /* Alerta global */
+        #alerta-global {
+            position: fixed; top: 80px; right: 20px;
+            z-index: 9999; min-width: 300px; max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar-banco d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <div class="brand">🏦 Banco Lupita</div>
+        <div class="usuario-info" id="nav-usuario">Cargando...</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="dashboard.html"   class="btn-nav"><i class="bi bi-grid me-1"></i>Dashboard</a>
+        <a href="cuentas.html"     class="btn-nav"><i class="bi bi-wallet2 me-1"></i>Mis cuentas</a>
+        <a href="account.html"     class="btn-nav"><i class="bi bi-plus-circle me-1"></i>Nueva cuenta</a>
+        <button class="btn-nav" onclick="cerrarSesion()"><i class="bi bi-box-arrow-right me-1"></i>Salir</button>
+    </div>
+</nav>
+
+<div id="alerta-global"></div>
+
+<div class="container pb-5" style="max-width:880px">
+
+    <!-- Loading -->
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" style="width:3rem;height:3rem"></div>
+        <p class="mt-3 text-muted">Cargando perfil…</p>
+    </div>
+
+    <div id="main" class="d-none">
+
+        <!-- Hero -->
+        <div class="perfil-hero mb-4">
+            <div class="avatar"><i class="bi bi-person-fill"></i></div>
+            <div class="nombre-full" id="hero-nombre">—</div>
+            <div class="desde"       id="hero-desde">—</div>
+            <span class="badge mt-2" style="background:rgba(255,255,255,.2);color:#fff;font-size:.78rem">
+                <i class="bi bi-shield-check me-1"></i>Cliente verificado
+            </span>
+        </div>
+
+        <!-- Chips -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="chip">
+                    <div class="val text-primary" id="chip-cuentas">—</div>
+                    <div class="lbl">Cuentas activas</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="chip">
+                    <div class="val text-success" id="chip-ops">—</div>
+                    <div class="lbl">Operaciones totales</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="chip">
+                    <div class="val" style="color:#e65100"><i class="bi bi-shield-lock-fill" style="font-size:1.4rem"></i></div>
+                    <div class="lbl">Contraseña cifrada</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="chip">
+                    <div class="val text-success"><i class="bi bi-check-circle-fill" style="font-size:1.4rem"></i></div>
+                    <div class="lbl">Cuenta activa</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Datos personales -->
+            <div class="col-md-7">
+                <div class="info-card">
+                    <div class="card-titulo"><i class="bi bi-person me-2"></i>Datos personales</div>
+
+                    <div class="dato-row">
+                        <div class="dato-icon ic-nombre"><i class="bi bi-person-badge"></i></div>
+                        <div><div class="dato-label">Nombre completo</div>
+                             <div class="dato-valor" id="dato-nombre">—</div></div>
+                    </div>
+                    <div class="dato-row">
+                        <div class="dato-icon ic-email"><i class="bi bi-envelope-fill"></i></div>
+                        <div>
+                            <div class="dato-label">Correo electrónico</div>
+                            <div class="dato-valor" id="dato-email">—</div>
+                            <div class="text-muted" style="font-size:.73rem">
+                                <i class="bi bi-lock me-1"></i>No se puede modificar
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dato-row">
+                        <div class="dato-icon ic-tel"><i class="bi bi-telephone-fill"></i></div>
+                        <div><div class="dato-label">Teléfono</div>
+                             <div class="dato-valor" id="dato-telefono">—</div></div>
+                    </div>
+                    <div class="dato-row">
+                        <div class="dato-icon ic-dir"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div><div class="dato-label">Dirección</div>
+                             <div class="dato-valor" id="dato-direccion">—</div></div>
+                    </div>
+                    <div class="dato-row">
+                        <div class="dato-icon ic-fecha"><i class="bi bi-calendar-check-fill"></i></div>
+                        <div><div class="dato-label">Miembro desde</div>
+                             <div class="dato-valor muted" id="dato-fecha">—</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editar datos -->
+            <div class="col-md-5">
+                <div class="edit-card">
+                    <div class="card-titulo"><i class="bi bi-pencil me-2"></i>Actualizar datos</div>
+                    <p class="text-muted small mb-3">Solo puedes editar tu teléfono y dirección.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Teléfono</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input type="tel" id="edit-telefono" class="form-control"
+                                   placeholder="Ej. 55 1234 5678">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Dirección</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <textarea id="edit-direccion" class="form-control" rows="3"
+                                      placeholder="Calle, número, colonia…"></textarea>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary w-100 py-2" onclick="guardarCambios()">
+                        <i class="bi bi-check2-circle me-1"></i>Guardar cambios
+                    </button>
+                    <div id="msg-edit" class="mt-3"></div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /main -->
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const sesion = {
+    usuarioId: parseInt(localStorage.getItem('usuarioId') || '0'),
+    nombre:    localStorage.getItem('nombre') || ''
+};
+if (!sesion.usuarioId) window.location.href = 'frontend_login/login.html';
+document.getElementById('nav-usuario').textContent = `Hola, ${sesion.nombre}`;
+
+function cerrarSesion() { localStorage.clear(); window.location.href = 'frontend_login/login.html'; }
+
+function fmtFecha(f) {
+    return new Date(f).toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
+}
+
+function mostrarAlerta(msg, tipo = 'success') {
+    const icono = tipo === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+    const div   = document.getElementById('alerta-global');
+    div.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show shadow" role="alert">
+            <i class="bi ${icono} me-2"></i>${msg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    setTimeout(() => { div.innerHTML = ''; }, 5000);
+}
+
+// ── Cargar perfil ─────────────────────────────────────────
+async function cargarPerfil() {
+    try {
+        const res  = await fetch(`perfil.php?usuarioId=${sesion.usuarioId}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        const u = data.usuario;
+        const r = data.resumen;
+
+        document.getElementById('hero-nombre').textContent   = `${u.nombre} ${u.apellidos}`;
+        document.getElementById('hero-desde').textContent    = `Cliente desde ${fmtFecha(u.fecha_registro)}`;
+        document.getElementById('chip-cuentas').textContent  = r.total_cuentas;
+        document.getElementById('chip-ops').textContent      = r.total_operaciones;
+        document.getElementById('dato-nombre').textContent   = `${u.nombre} ${u.apellidos}`;
+        document.getElementById('dato-email').textContent    = u.email;
+        document.getElementById('dato-telefono').textContent = u.telefono;
+        document.getElementById('dato-direccion').textContent= u.direccion;
+        document.getElementById('dato-fecha').textContent    = fmtFecha(u.fecha_registro);
+        document.getElementById('edit-telefono').value       = u.telefono;
+        document.getElementById('edit-direccion').value      = u.direccion;
+
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('main').classList.remove('d-none');
+
+    } catch (err) {
+        document.getElementById('loading').innerHTML =
+            `<div class="alert alert-danger mx-auto" style="max-width:400px">
+                <i class="bi bi-exclamation-triangle me-2"></i>${err.message}
+             </div>`;
+    }
+}
+
+// ── Guardar cambios (HU-05) ───────────────────────────────
+async function guardarCambios() {
+    const telefono  = document.getElementById('edit-telefono').value.trim();
+    const direccion = document.getElementById('edit-direccion').value.trim();
+    const msgDiv    = document.getElementById('msg-edit');
+    msgDiv.innerHTML = '';
+
+    if (!telefono || !direccion) {
+        msgDiv.innerHTML = `<div class="alert alert-warning py-2">Completa todos los campos.</div>`;
+        return;
+    }
+
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
+
+    try {
+        const res  = await fetch('perfil.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                usuarioId:     sesion.usuarioId,
+                solicitanteId: sesion.usuarioId,   // debe coincidir para pasar verificación
+                telefono,
+                direccion
+            })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            document.getElementById('dato-telefono').textContent  = telefono;
+            document.getElementById('dato-direccion').textContent = direccion;
+            msgDiv.innerHTML = '';
+            mostrarAlerta('Datos actualizados correctamente.', 'success');
+        } else {
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2">${data.error}</div>`;
+        }
+    } catch {
+        msgDiv.innerHTML = `<div class="alert alert-danger py-2">Error de conexión.</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Guardar cambios';
+    }
+}
+
+cargarPerfil();
+</script>
+</body>
+</html>
