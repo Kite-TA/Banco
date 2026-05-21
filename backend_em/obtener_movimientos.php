@@ -6,7 +6,7 @@ header("Access-Control-Allow-Origin: *");
 include 'conexion.php';
 
 /**
- * 🛠️ CAPTURA DE ID
+ * CAPTURA DE ID
  * Buscamos el ID en cualquier formato posible para mantener compatibilidad con tu login.
  */
 $id_bruto = $_GET['cuentaId'] ?? $_GET['cuenta_id'] ?? 0;
@@ -53,7 +53,7 @@ try {
     $transacciones = $stmtMovs->fetchAll(PDO::FETCH_ASSOC);
 
     /**
-     * 📊 MODO EXPORTACIÓN A EXCEL (CSV)
+     * MODO EXPORTACIÓN A EXCEL (CSV)
      * Si en la URL agregas &export=excel, el PHP descargará el archivo en lugar de mostrar JSON.
      */
     if (isset($_GET['export']) && $_GET['export'] === 'excel') {
