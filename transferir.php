@@ -23,7 +23,8 @@ try {
 $data            = json_decode(file_get_contents('php://input'), true);
 $cuentaId        = intval($data['cuentaId']        ?? 0);
 $cuentaDestino   = trim($data['cuentaDestino']     ?? '');
-$monto           = floatval($data['monto']         ?? 0);
+$montoRaw        = $data['monto']                 ?? '';
+$monto           = floatval($montoRaw);
 
 // ── VALIDACIONES ──────────────────────────────────────────
 if ($cuentaId <= 0) {
@@ -34,6 +35,11 @@ if ($cuentaId <= 0) {
 if (empty($cuentaDestino)) {
     http_response_code(400);
     echo json_encode(['error' => 'Debes ingresar el número de cuenta destino.']);
+    exit;
+}
+if (!is_numeric($montoRaw) || !preg_match('/^\d+(\.\d{0,2})?$/', trim((string)$montoRaw))) {
+    http_response_code(400);
+    echo json_encode(['error' => 'El monto debe tener como máximo dos decimales.']);
     exit;
 }
 if ($monto <= 0) {

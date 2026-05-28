@@ -519,11 +519,33 @@ function setBotonCargando(btn, cargando) {
 // ════════════════════════════════════════════════════════
 const LIMITE = 50000;
 
-function validarMonto(monto) {
+function validarMonto(monto, raw = '') {
     if (isNaN(monto) || monto <= 0)      return 'El monto debe ser mayor a cero.';
     if (monto > LIMITE)                   return `El monto supera el límite máximo ($${LIMITE.toLocaleString('es-MX')}).`;
+    if (raw && !/^[0-9]+(\.[0-9]{0,2})?$/.test(raw.trim())) {
+        return 'El monto debe tener como máximo dos decimales.';
+    }
     return null;
 }
+
+function limitarDecimalesInput(input, maxDecimals) {
+    if (!input) return;
+    const valor = input.value;
+    const partes = valor.split('.');
+    if (partes.length === 2 && partes[1].length > maxDecimals) {
+        input.value = partes[0] + '.' + partes[1].slice(0, maxDecimals);
+    }
+}
+
+function inicializarLimiteDecimales() {
+    ['monto-deposito', 'monto-retiro', 'monto-transferencia'].forEach(id => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener('input', () => limitarDecimalesInput(input, 2));
+    });
+}
+
+inicializarLimiteDecimales();
 
 // ════════════════════════════════════════════════════════
 //  OPERACIONES
@@ -535,9 +557,10 @@ async function ejecutarDeposito(e) {
     if (e) e.preventDefault();
 
     const inputMonto = document.getElementById('monto-deposito');
-    const monto = parseFloat(inputMonto.value);
+    const rawMonto = inputMonto.value.trim();
+    const monto = parseFloat(rawMonto);
     
-    const error = validarMonto(monto);
+    const error = validarMonto(monto, rawMonto);
     if (error) { mostrarAlerta(error, 'warning'); return; }
 
     // 🛠️ Corrección 2: Captura el botón usando el parámetro 'e' de forma segura
@@ -587,9 +610,10 @@ async function ejecutarRetiro(e) {
     if (e) e.preventDefault();
 
     const inputMonto = document.getElementById('monto-retiro');
-    const monto = parseFloat(inputMonto.value);
+    const rawMonto = inputMonto.value.trim();
+    const monto = parseFloat(rawMonto);
     
-    const error = validarMonto(monto);
+    const error = validarMonto(monto, rawMonto);
     if (error) { mostrarAlerta(error, 'warning'); return; }
 
     if (monto > sesion.saldo) {
@@ -642,12 +666,13 @@ let transferenciaEnEspera = null;
 
 async function ejecutarTransferencia() {
     const cuentaDestino = document.getElementById('cuenta-destino').value.trim();
-    const monto         = parseFloat(document.getElementById('monto-transferencia').value);
+    const rawMonto      = document.getElementById('monto-transferencia').value.trim();
+    const monto         = parseFloat(rawMonto);
 
     if (!cuentaDestino) {
         mostrarAlerta('Ingresa el número de cuenta destino.', 'warning'); return;
     }
-    const error = validarMonto(monto);
+    const error = validarMonto(monto, rawMonto);
     if (error) { mostrarAlerta(error, 'warning'); return; }
 
     if (monto > sesion.saldo) {
