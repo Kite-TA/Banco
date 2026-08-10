@@ -35,6 +35,22 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('La contraseña debe tener al menos 6 caracteres', 'danger');
             return;
         }
+        if (!validarNombreApellido(nombre)) {
+            mostrarMensaje('El nombre solo puede contener letras y espacios', 'danger');
+            return;
+        }
+        if (!validarNombreApellido(apellidos)) {
+            mostrarMensaje('Los apellidos solo pueden contener letras y espacios', 'danger');
+            return;
+        }
+        if (!validarTelefono(telefono)) {
+            mostrarMensaje('El teléfono solo puede contener números', 'danger');
+            return;
+        }
+        if (!validarDireccion(direccion)) {
+            mostrarMensaje('La dirección no puede contener caracteres especiales', 'danger');
+            return;
+        }
 
         // --- Enviar datos al servidor (PHP) usando fetch ---
         try {
@@ -72,5 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función auxiliar para mostrar mensajes con Bootstrap
     function mostrarMensaje(texto, tipo) {
         mensajeDiv.innerHTML = `<div class="alert alert-${tipo}" role="alert">${texto}</div>`;
+    }
+
+    function validarNombreApellido(valor) {
+        return /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(valor);
+    }
+
+    function validarTelefono(valor) {
+        return /^[0-9]+$/.test(valor);
+    }
+
+    function validarDireccion(valor) {
+        return /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ,.\-#\/]+$/.test(valor);
     }
 });
